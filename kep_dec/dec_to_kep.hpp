@@ -1,16 +1,20 @@
 // dec_to_kep.hpp
-// Декартово состояние (r, v) -> кеплеровские элементы.
-// Элементы - вектор Eigen из 6 компонент (углы в радианах):
-//   kep(0) = a     большая полуось
-//   kep(1) = e     эксцентриситет
-//   kep(2) = i     наклонение
-//   kep(3) = raan  долгота восходящего узла
-//   kep(4) = argp  аргумент перицентра
-//   kep(5) = nu    истинная аномалия
 #pragma once
 
 #include <Eigen/Dense>
 
-Eigen::Matrix<double, 6, 1> dec_to_kep(const Eigen::Vector3d& r,
-                                       const Eigen::Vector3d& v,
-                                       double mu);
+class DecToKep {
+public:
+    explicit DecToKep(double mu) : mu_(mu) {}
+
+    Eigen::Matrix<double, 6, 1> convert(const Eigen::Vector3d& r,
+                                        const Eigen::Vector3d& v) const;
+
+private:
+    static double wrap_angle(double x);
+    static double signed_angle(const Eigen::Vector3d& a,
+                               const Eigen::Vector3d& b,
+                               const Eigen::Vector3d& n);
+
+    double mu_;
+};
