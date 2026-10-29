@@ -4,8 +4,8 @@
 #include <cmath>
 #include <string>
 
-#include "dec_to_kep/dec_to_kep.hpp"
-#include "kep_to_dec/kep_to_dec.hpp"
+#include "kep_dec/dec_to_kep.hpp"
+#include "kep_dec/kep_to_dec.hpp"
 
 const double MU = 398600.4418;
 const double PI = 3.14159265358979323846;
