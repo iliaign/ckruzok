@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.10)
+project(kepler_demo CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+find_package(Eigen3 REQUIRED NO_MODULE)
+add_executable(kepler_demo main.cpp dec_to_kep.cpp kep_to_dec.cpp)
+target_link_libraries(kepler_demo Eigen3::Eigen)
