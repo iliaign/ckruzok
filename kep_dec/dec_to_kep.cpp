@@ -1,52 +1,78 @@
 // dec_to_kep.cpp
 #include "dec_to_kep.hpp"
+
 #include <cmath>
+#include <limits>
+
+namespace kep_dec {
+
+namespace {
 
 // приведение угла к [0, 2pi)
-double DecToKep::wrap_angle(double x) {
-    x = std::fmod(x, 2.0 * M_PI);
+double wrap_angle(const double x_in) {
+    double x = std::fmod(x_in, 2.0 * M_PI);
     if (x < 0.0) x += 2.0 * M_PI;
     return x;
 }
 
-double DecToKep::signed_angle(const Eigen::Vector3d& a,
-                              const Eigen::Vector3d& b,
-                              const Eigen::Vector3d& n) {
+// n должен быть единичным (или нулевым); длины a и b на atan2 не влияют
+double signed_angle(const Eigen::Vector3d& a,
+                    const Eigen::Vector3d& b,
+                    const Eigen::Vector3d& n) {
     return std::atan2(a.cross(b).dot(n), a.dot(b));
 }
 
-Eigen::Matrix<double, 6, 1> DecToKep::convert(const Eigen::Vector3d& r,
-                                              const Eigen::Vector3d& v) const {
-
-    const double rn = r.norm();
-    const double vn = v.norm();
-
-    //вектор орбиального момента 
-    const Eigen::Vector3d l = r.cross(v);                              // орбитальный момент
-    const Eigen::Vector3d l_hat = l.normalized();
-
-    // экваториальная орбита линия узлов не определен
-    // направление на восходящий узел совпадает с осью x
-    Eigen::Vector3d nvec = Eigen::Vector3d::UnitZ().cross(l);          // линия узлов
-    const bool equatorial = nvec.norm() < 1e-10;
-    nvec = equatorial ? Eigen::Vector3d(Eigen::Vector3d::UnitX()) : nvec;
-
-    const Eigen::Vector3d evec = ((vn * vn - mu_ / rn) * r - r.dot(v) * v) / mu_; //векторный эксентриситет
-    // круговая орбита e1 = e/|e| при e != 0, иначе e1 = N 
-    const Eigen::Vector3d e1 = (evec.norm() > 1e-10) ? evec.normalized() : nvec.normalized();
-
-    Eigen::Matrix<double, 6, 1> kep;
-    kep(0) = 1.0 / (2.0 / rn - vn * vn / mu_);                         // a
-
-    kep(1) = evec.norm();                                              // e
-
-    kep(2) = std::atan2( l.head<2>().norm(), l.z() );                  // L
-
-    kep(3) = wrap_angle(std::atan2(nvec.y(), nvec.x()));               // долгтоа восходящего узла
-
-    kep(4) = wrap_angle(signed_angle(nvec, e1, l_hat));                // аргумент перицентра 
-
-    kep(5) = wrap_angle(signed_angle(e1, r, l_hat));                   // истинная анамалия
-
-    return kep;
+// нормировка без деления на ноль: нулевой вектор остаётся нулевым
+Eigen::Vector3d unit_or_zero(const Eigen::Vector3d& x) {
+    const double n = x.norm();
+    return (n == 0.0) ? Eigen::Vector3d(Eigen::Vector3d::Zero())
+                      : Eigen::Vector3d(x / n);
 }
+
+}  // namespace
+
+KeplerOut convert(const Eigen::Vector3d& r,
+               const Eigen::Vector3d& v,
+               const double mu) {
+    const double rn = r.norm();
+
+    // делим на mu и на rn
+    if (mu == 0.0 || rn == 0.0) {
+        return KeplerOut{};
+    }
+
+    const double vn2 = v.squaredNorm();
+
+    // вектор орбитального момента (нулевой для прямолинейной орбиты)
+    const Eigen::Vector3d l = r.cross(v);
+    const Eigen::Vector3d l_hat = unit_or_zero(l);
+
+    // линия узлов; нулевая -> экваториальная орбита, берём ось X
+    const Eigen::Vector3d n_raw = Eigen::Vector3d::UnitZ().cross(l);
+    const bool equatorial = (n_raw.squaredNorm() == 0.0);
+    const Eigen::Vector3d nvec =
+        equatorial ? Eigen::Vector3d(Eigen::Vector3d::UnitX()) : n_raw;
+
+    // вектор эксцентриситета (деление на mu != 0)
+    const Eigen::Vector3d evec = ((vn2 - mu / rn) * r - r.dot(v) * v) / mu;
+
+    // нулевой -> круговая орбита, направление отсчёта = узел
+    const bool circular = (evec.squaredNorm() == 0.0);
+    const Eigen::Vector3d e1 = circular ? nvec : evec;
+
+    // 1/a == 0 -> параболическая орбита, a = inf
+    const double inv_a = 2.0 / rn - vn2 / mu;
+    const double a = (inv_a == 0.0) ? std::numeric_limits<double>::infinity()
+                                    : 1.0 / inv_a;
+
+    return KeplerOut{
+        a,
+        evec.norm(),                                        // e
+        std::atan2(l.head<2>().norm(), l.z()),              // inc
+        wrap_angle(std::atan2(nvec.y(), nvec.x())),         // raan
+        wrap_angle(signed_angle(nvec, e1, l_hat)),          // argp
+        wrap_angle(signed_angle(e1, r, l_hat))              // nu
+    };
+}
+
+}  // namespace kep_dec

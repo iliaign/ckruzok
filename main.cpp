@@ -1,31 +1,36 @@
+#include <cmath>
 #include <iostream>
+
 #include "dec_to_kep.hpp"
 #include "kep_to_dec.hpp"
 
 int main() {
-    double mu = 398600.4418; // Земля
-    DecToKep d2k(mu);
-    KepToDec k2d(mu);
+    using namespace kep_dec;
+
+    const double mu = 398600.4418;  // Земля
 
     // Список тестов: {название, a, e, i, raan, argp, nu} (углы в градусах)
     struct Test { const char* name; double a, e, i, raan, argp, nu; };
-    Test tests[] = {
+    const Test tests[] = {
         {"Эллипс",        7000, 0.1, 45, 30, 60, 90},
         {"Круговая",      7000, 0.0, 45, 30,  0, 90},
         {"Экваториал",    7000, 0.2,  0,  0, 60, 90},
         {"Круг+экватор",  7000, 0.0,  0,  0,  0, 90},
     };
 
-    for (auto& t : tests) {
-        Eigen::Matrix<double, 6, 1> kep;
-        kep << t.a, t.e, t.i*M_PI/180, t.raan*M_PI/180, t.argp*M_PI/180, t.nu*M_PI/180;
+    const double d2r = M_PI / 180.0;
 
-        Eigen::Vector3d r, v, r2, v2;
-        k2d.convert(kep, r, v);       // Kep -> Dec
-        auto kep2 = d2k.convert(r, v); // Dec -> Kep
-        k2d.convert(kep2, r2, v2);     // Kep -> Dec (проверка)
+    for (const auto& t : tests) {
+        const KeplerIn kep{t.a, t.e, t.i * d2r, t.raan * d2r, t.argp * d2r, t.nu * d2r};
 
-        std::cout << t.name << ": ошибка r = " << (r - r2).norm() << "\n";
+        const auto [r, v]    = convert(kep, mu);    // Kep -> Dec
+        const KeplerOut out  = convert(r, v, mu);   // Dec -> Kep
+        const KeplerIn kep2{out.a, out.e, out.inc, out.raan, out.argp, out.nu};
+        const auto [r2, v2]  = convert(kep2, mu);   // Kep -> Dec (проверка)
+
+        std::cout << t.name
+                  << ": ошибка r = " << (r - r2).norm()
+                  << ", ошибка v = " << (v - v2).norm() << "\n";
     }
     return 0;
 }
