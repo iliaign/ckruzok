@@ -11,9 +11,16 @@ add_library(kep_dec_lib STATIC
     kep_dec/kep_to_dec.hpp
 )
 
+add_library(predict_lib STATIC
+    predict/eccentric_to_mean.cpp
+    predict/mean_motion.cpp
+    predict/solve_kepler.cpp
+    predict/eccentric_to_true.cpp
+)
+target_include_directories(predict_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/predict)
 target_include_directories(kep_dec_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/kep_dec)
+
 target_link_libraries(kep_dec_lib PUBLIC Eigen3::Eigen)
-target_compile_features(kep_dec_lib PRIVATE cxx_std_17)
 
 add_executable(kep_dec main.cpp)
 target_link_libraries(kep_dec PRIVATE kep_dec_lib)
