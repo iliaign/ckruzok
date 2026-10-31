@@ -6,5 +6,5 @@
 #include <Eigen/Dense>
 #include "dec_to_kep.hpp"
 
-std::tuple<Eigen::Vector3d, Eigen::Vector3d> convert(const KeplerIn& kep, double mu);
+std::tuple<Eigen::Vector3d, Eigen::Vector3d> convert(const Kepler& kep, double mu);
 

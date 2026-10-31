@@ -5,7 +5,6 @@
 #include "kep_to_dec.hpp"
 
 int main() {
-    using namespace kep_dec;
 
     const double mu = 398600.4418;  // Земля
 

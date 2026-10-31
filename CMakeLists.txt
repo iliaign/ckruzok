@@ -12,10 +12,12 @@ add_library(kep_dec_lib STATIC
 )
 
 add_library(predict_lib STATIC
-    predict/eccentric_to_mean.cpp
+    predict/ean_mean.cpp
     predict/mean_motion.cpp
     predict/solve_kepler.cpp
-    predict/eccentric_to_true.cpp
+    predict/ecsrt_v_ist.cpp
+    predict/ist_v_ecrt.cpp
+
 )
 target_include_directories(predict_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/predict)
 target_include_directories(kep_dec_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/kep_dec)
