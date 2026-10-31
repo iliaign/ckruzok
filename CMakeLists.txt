@@ -3,7 +3,7 @@ project(kep_dec CXX)
 
 find_package(Eigen3 REQUIRED NO_MODULE)
 
-# --- статическая библиотека с конверторами ---
+
 add_library(kep_dec_lib STATIC
     kep_dec/dec_to_kep.cpp
     kep_dec/dec_to_kep.hpp
@@ -15,7 +15,6 @@ target_include_directories(kep_dec_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/kep_de
 target_link_libraries(kep_dec_lib PUBLIC Eigen3::Eigen)
 target_compile_features(kep_dec_lib PRIVATE cxx_std_17)
 
-# --- исполняемый файл ---
 add_executable(kep_dec main.cpp)
 target_link_libraries(kep_dec PRIVATE kep_dec_lib)
 target_compile_features(kep_dec PRIVATE cxx_std_17)

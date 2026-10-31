@@ -21,11 +21,11 @@ int main() {
     const double d2r = M_PI / 180.0;
 
     for (const auto& t : tests) {
-        const KeplerIn kep{t.a, t.e, t.i * d2r, t.raan * d2r, t.argp * d2r, t.nu * d2r};
+        const Kepler kep{t.a, t.e, t.i * d2r, t.raan * d2r, t.argp * d2r, t.nu * d2r};
 
         const auto [r, v]    = convert(kep, mu);    // Kep -> Dec
-        const KeplerOut out  = convert(r, v, mu);   // Dec -> Kep
-        const KeplerIn kep2{out.a, out.e, out.inc, out.raan, out.argp, out.nu};
+        const Kepler out  = convert(r, v, mu);   // Dec -> Kep
+        const Kepler kep2{out.a, out.e, out.inc, out.raan, out.argp, out.nu};
         const auto [r2, v2]  = convert(kep2, mu);   // Kep -> Dec (проверка)
 
         std::cout << t.name
