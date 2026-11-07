@@ -21,12 +21,8 @@ Kepler convert(const Eigen::Vector3d& r,const Eigen::Vector3d& v,  const double 
     const bool equatorial = (n_raw.squaredNorm() == 0.0);
     const Eigen::Vector3d nvec = equatorial ? Eigen::Vector3d(Eigen::Vector3d::UnitX()) : n_raw;
     const Eigen::Vector3d evec = ((vn2 - mu / rn) * r - r.dot(v) * v) / mu;
-    //вторая часть скобки, если ортиа круговая то вектор
-    //эксентриситета совпадает с напрвелнеим на 
-    //восходящий узел
     const bool circular = (evec.squaredNorm() == 0.0);
     const Eigen::Vector3d e1 = circular ? nvec : evec;
-
     const double inv_a = 2.0 / rn - vn2 / mu;
     const double a =  1.0 / inv_a;
 

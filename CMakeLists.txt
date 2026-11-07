@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(kep_dec CXX)
+project(cosmos CXX)
 
 find_package(Eigen3 REQUIRED NO_MODULE)
 
@@ -28,8 +28,8 @@ target_include_directories(kep_dec_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/kep_de
 target_link_libraries(kep_dec_lib PUBLIC Eigen3::Eigen)
 target_link_libraries(predict_lib PUBLIC kep_dec_lib)
 
-add_executable(kep_dec main.cpp)
-target_link_libraries(kep_dec PRIVATE kep_dec_lib predict_lib)
-target_compile_features(kep_dec PRIVATE cxx_std_17)
+add_executable(cosmos main.cpp)
+target_link_libraries(cosmos PRIVATE kep_dec_lib predict_lib)
+target_compile_features(cosmos PRIVATE cxx_std_17)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

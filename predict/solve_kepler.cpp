@@ -6,6 +6,7 @@
 
 
 static constexpr int    kMaxIter = 50;
+//тут подключить стд лимится
 static constexpr double kTol     = 1e-14;  // остановка по |dE|
 
 
