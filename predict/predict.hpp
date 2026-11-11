@@ -1,21 +1,10 @@
-// predict.hpp - мастер-заголовок библиотеки predict_lib
+// predict.hpp
 #pragma once
 
+#include <Eigen/Dense>
 #include <tuple>
 
-#include <Eigen/Dense>
 
-#include "kep_dec.hpp"
-#include "ist_v_ecrt.hpp"
-#include "ean_mean.hpp"
-#include "mean_motion.hpp"
-#include "solve_kepler.hpp"
-#include "ecsrt_v_ist.hpp"
+using State = std::tuple<Eigen::Vector3d, Eigen::Vector3d>;
 
-std::tuple<Eigen::Vector3d, Eigen::Vector3d> predict(
-    const Eigen::Vector3d& r0,
-    const Eigen::Vector3d& v0,
-    double t0,
-    double t,
-    double mu
-    );
+State predict(const Eigen::Vector3d &r0, const Eigen::Vector3d &v0, double t0, double t, double mu);

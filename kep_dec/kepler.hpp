@@ -1,6 +1,7 @@
 #pragma once
 
-struct Kepler {
+struct Kepler
+{
     double a{};
     double e{};
     double inc{};
