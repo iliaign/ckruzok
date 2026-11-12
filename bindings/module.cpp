@@ -1,7 +1,3 @@
-#include <nanobind/eigen/dense.h>
-#include <nanobind/nanobind.h>
-#include <nanobind/stl/tuple.h>
-
 #include "dec_to_kep.hpp"
 #include "ean_mean.hpp"
 #include "ecsrt_v_ist.hpp"
@@ -11,6 +7,11 @@
 #include "mean_motion.hpp"
 #include "predict.hpp"
 #include "solve_kepler.hpp"
+#include <nanobind/eigen/dense.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/tuple.h>
+
 
 namespace nb = nanobind;
 
