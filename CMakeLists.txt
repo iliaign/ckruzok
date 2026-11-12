@@ -14,7 +14,6 @@ execute_process(
   OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
 find_package(nanobind CONFIG REQUIRED)
 
-# 3. Ваши существующие статические библиотеки
 find_package(Eigen3 REQUIRED NO_MODULE)
 
 add_library(kep_dec_lib STATIC
